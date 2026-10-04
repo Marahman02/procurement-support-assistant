@@ -4,9 +4,7 @@ A small retrieval-augmented (RAG) assistant for blocked supplier invoices. You d
 
 All data in this project is **synthetic** (made up). It is a demo of the pattern, not a product, and it has no real users.
 
-**Live demo:** PASTE-YOUR-STREAMLIT-LINK-HERE
-
-To try it, paste your own Anthropic API key into the sidebar. The key is used for your session only and is never stored.
+To use the app, paste your own Anthropic API key into the sidebar. The key is used for your session only and is never stored.
 
 ## The problem
 
