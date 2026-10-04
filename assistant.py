@@ -101,7 +101,7 @@ def answer(incident: str, api_key: str | None = None) -> dict:
     if not api_key:
         return {
             "status": "error",
-            "message": "ANTHROPIC_API_KEY environment variable is not set.",
+            "message": "Enter your Anthropic API key in the sidebar.",
             "matches": matches,
         }
 
