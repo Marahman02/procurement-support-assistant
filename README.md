@@ -33,13 +33,13 @@ When a company buys from suppliers, three records should agree before a bill is 
 ## How it works
 
 ```mermaid
-flowchart LR
-    A["Incident text"] --> B["Embed with all-MiniLM-L6-v2"]
-    B --> C["ChromaDB: 3 closest tickets"]
-    C --> D{"Best score 0.40 or higher?"}
+flowchart TD
+    A["Incident text"] --> B["Embed the text with all-MiniLM-L6-v2"]
+    B --> C["ChromaDB finds the 3 closest tickets"]
+    C --> D{"Best score at least 0.40?"}
     D -- "No" --> E["Stop: no similar cases, no model call"]
-    D -- "Yes" --> F["Claude: causes, steps, draft with cited IDs"]
-    F --> G["Check JSON and citations"]
+    D -- "Yes" --> F["Claude drafts causes, steps and report"]
+    F --> G["Code checks the JSON and the citations"]
     G --> H["Person reviews and approves"]
     H --> I["Download report"]
 ```
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Example output
 
-Abridged, from a local run with the first input above.
+Abridged and lightly reworded, from a local run with the first input above.
 
 > **Root causes**
 > 1. The invoice price is above the purchase order price and outside the price tolerance. The supplier may have raised its list price after the order was placed. *Sources: TKT-001*
@@ -87,4 +87,66 @@ Abridged, from a local run with the first input above.
 
 | Decision | Why |
 |---|---|
-| Retrieve first, then answer
+| Retrieve first, then answer from what was found | Each suggestion can cite its source, and the knowledge grows by adding tickets, not by retraining |
+| Score cutoff before the model call | Unrelated input never costs a model call |
+| A second check inside the model prompt | A score cannot tell similar wording from the same problem. The expense-report case scored 0.57 and still had to be declined |
+| Citations verified in code | The prompt asks for real ticket IDs, and the code enforces it |
+| Parse failures shown as errors | A reply that cannot be read is never shown as a clean result |
+| Human approval before download | Support decisions have consequences and the model can be wrong |
+| API key passed as an argument, never stored | On a shared server, one visitor's key must not reach another's session |
+| Search tested separately from the model | A bad answer can come from poor retrieval or a poor prompt, and separate tests show which |
+
+## Limitations
+
+- It only knows the 40 synthetic tickets. If the right answer is not there, it cannot find it.
+- The 0.40 cutoff is a judgment call between the scores of unrelated and real queries. It rests on a limited sample and would need retuning on real data.
+- Similar-sounding problems with different causes can be confused.
+- Claude's output varies between runs, which is one reason a person approves every draft.
+- Drafts can overstate certainty, for example saying a past case happened "under the same circumstances". Review before approving.
+
+## Next steps
+
+- Re-ranking, or combining keyword and semantic search, to fix misses like the carton query
+- A larger test set written in messy, real-world wording, measured without tuning against the same queries
+- Containerize with Docker and run the search test automatically in CI
+
+## Run it locally
+
+Tested on Python 3.11. The deployed app runs on Streamlit Cloud's default Python version.
+
+```
+git clone https://github.com/Marahman02/procurement-support-assistant.git
+cd procurement-support-assistant
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Paste your Anthropic key into the sidebar, or set the `ANTHROPIC_API_KEY` environment variable before starting. The first run downloads the embedding model (about 80 MB), so it pauses for a minute. Run the search test with:
+
+```
+python retrieval_test.py
+```
+
+## Project structure
+
+```
+.
+├── app.py              Streamlit page: key box, incident box, results, editable draft, Approve and download
+├── assistant.py        Cutoff, prompt, model call, JSON parsing and citation check
+├── retriever.py        Builds the ChromaDB index and searches it
+├── retrieval_test.py   Runs the test queries and reports hit rate at 3
+├── queries.json        The 12 test queries and their expected tickets
+├── requirements.txt    chromadb, anthropic, streamlit
+└── data/
+    └── tickets.json    The 40 synthetic tickets across 8 problem types
+```
+
+## Built with
+
+Python, ChromaDB, the Anthropic API and Streamlit. The code was written with Claude Code from prompts I gave it in small steps. I designed the approach, ran and checked each step, and deployed it. The tickets were generated with Claude Code from a written specification, and they use general procurement terms only.
+
+## Author
+
+Mohammed Abdur Rahman. [GitHub](https://github.com/Marahman02) | [LinkedIn](https://www.linkedin.com/in/abdur-rahmanmohd)
