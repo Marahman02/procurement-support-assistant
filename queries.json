@@ -1,0 +1,14 @@
+[
+  {"query": "vendor raised the unit price after we placed the order and the invoice got stopped", "expected_ids": ["TKT-001"]},
+  {"query": "we ordered by the carton but they billed per single item, so the amounts are way off", "expected_ids": ["TKT-026"]},
+  {"query": "the discount we negotiated wasn't applied, so the invoice total is higher than the order total", "expected_ids": ["TKT-003"]},
+  {"query": "our order was in US dollars but the supplier's invoice came in euros", "expected_ids": ["TKT-021"]},
+  {"query": "invoice says 100 units but only 60 have been booked in at the warehouse so far", "expected_ids": ["TKT-006"]},
+  {"query": "supplier shipped more units than we ordered and billed us for all of them", "expected_ids": ["TKT-007"]},
+  {"query": "nobody recorded the delivery because the person who books in goods was on leave", "expected_ids": ["TKT-011"]},
+  {"query": "this is a consulting service, not physical goods, but the order expects a delivery", "expected_ids": ["TKT-012"]},
+  {"query": "we really did send the same payment to the supplier twice", "expected_ids": ["TKT-017"]},
+  {"query": "it looks like we paid twice, but the supplier's credit note was never entered on our side", "expected_ids": ["TKT-020"]},
+  {"query": "payment went out late because the delivery date recorded was wrong", "expected_ids": ["TKT-034"]},
+  {"query": "we can't pay the supplier because we have no bank account on file for them", "expected_ids": ["TKT-036"]}
+]

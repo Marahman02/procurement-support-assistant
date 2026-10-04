@@ -1,0 +1,282 @@
+[
+  {
+    "id": "TKT-001",
+    "symptom": "Invoice blocked for price.",
+    "root_cause": "The supplier raised its list price at the start of the quarter, but the purchase order still carried the old unit price. The invoice unit price was 6% above the PO price, which is outside the 2% price tolerance.",
+    "resolution": "Buyer confirmed the new price with the supplier, updated the PO line price, and the invoice was released on the next matching run.",
+    "category": "price_difference"
+  },
+  {
+    "id": "TKT-002",
+    "symptom": "Accounts payable says an invoice from our packaging supplier has been stuck for two weeks. The total on the invoice is higher than the purchase order total, and the supplier is now chasing us for payment and threatening to put our account on hold.",
+    "root_cause": "The supplier added a fuel surcharge line that was never agreed on the purchase order. The goods price itself matched; the extra charge pushed the invoice total over the PO value.",
+    "resolution": "Buyer rejected the surcharge as not contractually agreed. Supplier issued a credit note for the surcharge amount, and the remaining invoice amount matched and was paid.",
+    "category": "price_difference"
+  },
+  {
+    "id": "TKT-003",
+    "symptom": "Invoice total does not match the PO total and the invoice is sitting in the blocked list.",
+    "root_cause": "The PO was created with a volume discount of 10% that only applies to orders above 1,000 units. The order was later reduced to 800 units, but the discount was left on the PO, so the PO price was lower than what the supplier correctly invoiced.",
+    "resolution": "Buyer removed the volume discount from the PO line to reflect the reduced quantity. The invoice then matched within tolerance and was released.",
+    "category": "price_difference"
+  },
+  {
+    "id": "TKT-004",
+    "symptom": "Price variance block on a catalog item, small amount, maybe a rounding thing?",
+    "root_cause": "The catalog price was maintained with two decimals while the supplier invoices with four decimals per unit. Over 25,000 units the rounding difference grew to more than the absolute tolerance limit.",
+    "resolution": "Catalog price was updated to four decimal places to match the supplier's pricing. The blocked invoice was released manually with approval from the AP lead, since the difference was explained.",
+    "category": "price_difference"
+  },
+  {
+    "id": "TKT-005",
+    "symptom": "We received an invoice for a framework agreement call-off and it got blocked straight away. The price on the invoice is the price in the signed contract, I checked. So why does the system think the price is wrong?",
+    "root_cause": "The contract had been renewed with new pricing, but the call-off purchase order was created from the old, expired version of the agreement and pulled in the previous year's price.",
+    "resolution": "Procurement updated the contract reference on the PO to point to the current agreement, which refreshed the price. The invoice matched and was released. Old agreement version was closed to prevent new call-offs against it.",
+    "category": "price_difference"
+  },
+  {
+    "id": "TKT-006",
+    "symptom": "Invoice blocked because quantity invoiced is more than quantity received.",
+    "root_cause": "The supplier shipped and invoiced the full order of 500 units, but the warehouse only booked a goods receipt for the first pallet of 200 units. The remaining pallets were physically in the warehouse but not received in the system.",
+    "resolution": "Warehouse posted the goods receipt for the remaining 300 units after checking the delivery notes. The invoice matched on the next run.",
+    "category": "quantity_difference"
+  },
+  {
+    "id": "TKT-007",
+    "symptom": "Invoice blocked because quantity invoiced is more than quantity received.",
+    "root_cause": "The supplier over-delivered by 50 units without authorization and invoiced for all of them. The warehouse correctly received only the ordered quantity and returned the extra units.",
+    "resolution": "AP asked the supplier for a corrected invoice matching the ordered and received quantity. The original invoice was rejected and the corrected invoice was paid.",
+    "category": "quantity_difference"
+  },
+  {
+    "id": "TKT-008",
+    "symptom": "Qty mismatch.",
+    "root_cause": "A partial delivery was invoiced as if it were the full order. The supplier's billing system defaulted to the PO quantity instead of the shipped quantity.",
+    "resolution": "Supplier credited the invoice and reissued it for the shipped quantity only. Supplier was asked to fix their billing setup so partial shipments are invoiced correctly.",
+    "category": "quantity_difference"
+  },
+  {
+    "id": "TKT-009",
+    "symptom": "Our lab ordered 12 boxes of gloves, we got 12 boxes, the invoice says 12 boxes, and it is still blocked for a quantity problem. I don't understand what else needs to match. Can someone take a look before the supplier puts us on stop?",
+    "root_cause": "Part of the goods receipt had been reversed by mistake during a stock count correction. The system showed only 8 boxes received against the PO, even though all 12 were physically on site.",
+    "resolution": "Inventory team re-posted the receipt for the 4 reversed boxes with a note referencing the stock count. The invoice matched and was released.",
+    "category": "quantity_difference"
+  },
+  {
+    "id": "TKT-010",
+    "symptom": "Invoice for 100 units blocked, received quantity shows 100, invoiced shows 100, but the block says quantity.",
+    "root_cause": "The goods receipt was posted against PO line 20 while the invoice referenced PO line 10. Line 10 had nothing received, so the invoice failed the quantity check even though totals agreed across the whole PO.",
+    "resolution": "Warehouse reversed the receipt on line 20 and reposted it on line 10, which was the correct line for the delivered item. The invoice matched immediately.",
+    "category": "quantity_difference"
+  },
+  {
+    "id": "TKT-011",
+    "symptom": "Invoice can't be matched, no goods receipt found.",
+    "root_cause": "The goods had arrived at the loading dock but the receiving clerk was on leave, and nobody else posted the goods receipt. The invoice arrived before any receipt existed.",
+    "resolution": "Requester confirmed the delivery and a backup clerk posted the goods receipt. Receiving duties were added to the cover plan for absences.",
+    "category": "missing_goods_receipt"
+  },
+  {
+    "id": "TKT-012",
+    "symptom": "Invoice can't be matched, no goods receipt found.",
+    "root_cause": "The PO was for consulting services and should have been set up as a services PO with service entry confirmation. It was created as a standard goods PO, so the system expected a physical goods receipt that nobody would ever post.",
+    "resolution": "Buyer recreated the order as a services PO, the requester confirmed the services delivered, and the invoice was moved to the new PO and paid.",
+    "category": "missing_goods_receipt"
+  },
+  {
+    "id": "TKT-013",
+    "symptom": "The supplier sent their invoice the same day they shipped, so it's waiting for receipt. That's expected. But it's now been a month and it is still waiting, and the requester swears the goods arrived weeks ago. Where is the receipt?",
+    "root_cause": "The goods were delivered to a different site than the one on the PO. The receiving site didn't recognize the PO and set the delivery aside without booking it.",
+    "resolution": "Delivery was located at the other site and the goods receipt was posted there with the correct PO reference. Requester was reminded to keep the delivery address on the PO accurate.",
+    "category": "missing_goods_receipt"
+  },
+  {
+    "id": "TKT-014",
+    "symptom": "Invoice on hold - GR missing",
+    "root_cause": "The goods receipt had been posted and then reversed by the warehouse because the delivery was damaged. Replacement goods were delivered, but no new receipt was posted for them.",
+    "resolution": "Warehouse posted a goods receipt for the replacement delivery. Invoice matched and was released.",
+    "category": "missing_goods_receipt"
+  },
+  {
+    "id": "TKT-015",
+    "symptom": "Recurring monthly invoice for office cleaning keeps getting blocked every single month waiting for a receipt. We pay this every month and it's always the same amount. Is there a way to stop this happening?",
+    "root_cause": "The blanket PO for cleaning services requires a monthly confirmation from the facilities manager before invoices can match. The facilities manager changed and the new one didn't know about this step.",
+    "resolution": "New facilities manager was shown how to confirm monthly service receipts and added a calendar reminder. Backlog of three months was confirmed and the invoices were released.",
+    "category": "missing_goods_receipt"
+  },
+  {
+    "id": "TKT-016",
+    "symptom": "Duplicate invoice warning on an invoice that we've never seen before.",
+    "root_cause": "The supplier reused an invoice number from last year after resetting their numbering at year end. The system flagged it because the same supplier and invoice number already existed.",
+    "resolution": "AP confirmed with the supplier that it was a new invoice with different goods and dates. Invoice was posted with a year suffix on the reference, and the supplier was asked to use unique numbering going forward.",
+    "category": "duplicate_invoice"
+  },
+  {
+    "id": "TKT-017",
+    "symptom": "Supplier says we paid them twice for the same invoice.",
+    "root_cause": "The invoice was received once by email and once by post. The email copy was entered with the reference 'INV-4471' and the paper copy as 'INV 4471' without the hyphen, so the duplicate check did not catch it.",
+    "resolution": "Supplier refunded the second payment. AP introduced a rule to strip spaces and punctuation from invoice references before the duplicate check, and asked the supplier to send invoices through one channel only.",
+    "category": "duplicate_invoice"
+  },
+  {
+    "id": "TKT-018",
+    "symptom": "Dup flag",
+    "root_cause": "The supplier sent a payment reminder that looked like an invoice, and it was entered as a new invoice with the same reference and amount.",
+    "resolution": "The reminder was rejected as a duplicate. The original invoice was confirmed as already scheduled for payment, and the supplier was told the payment date.",
+    "category": "duplicate_invoice"
+  },
+  {
+    "id": "TKT-019",
+    "symptom": "Invoice was blocked as a possible duplicate. It has the same amount and date as another invoice from the same supplier, but it's for a completely different delivery. We order the same standard item from them every week so the totals are often identical.",
+    "root_cause": "The duplicate check compares supplier, amount and invoice date. Two genuine invoices for identical weekly deliveries were issued on the same day, so the second was flagged even though it had a different invoice number and PO.",
+    "resolution": "AP verified both invoices against separate goods receipts and released the second one. The supplier was added to a list where duplicate checks also require the PO reference to match before blocking.",
+    "category": "duplicate_invoice"
+  },
+  {
+    "id": "TKT-020",
+    "symptom": "Supplier says we paid them twice for the same invoice.",
+    "root_cause": "The invoice was not duplicated. The supplier had issued a credit note and a corrected invoice, and AP processed the corrected invoice but the credit note was never entered, so the net effect looked like a double payment on the supplier's statement.",
+    "resolution": "AP entered the missing credit note, which offset the original invoice. The supplier's statement was reconciled and no refund was needed.",
+    "category": "duplicate_invoice"
+  },
+  {
+    "id": "TKT-021",
+    "symptom": "Invoice total does not match the PO total and the invoice is sitting in the blocked list.",
+    "root_cause": "The invoice was issued in euros while the PO was raised in US dollars. The values were compared without conversion, so the totals looked different even though the price was correct in the agreed currency.",
+    "resolution": "Supplier was asked to reissue the invoice in US dollars as agreed on the PO. The supplier master record was updated to show the correct order currency.",
+    "category": "tax_currency_mismatch"
+  },
+  {
+    "id": "TKT-022",
+    "symptom": "Tax amount on invoice is different from what we calculated.",
+    "root_cause": "The supplier charged the standard sales tax rate, but the goods were for export and should have been zero-rated. The PO had the correct tax code, so the tax amounts didn't agree.",
+    "resolution": "Supplier issued a credit note and a new invoice with the correct zero rate. Tax team confirmed the export documentation was on file.",
+    "category": "tax_currency_mismatch"
+  },
+  {
+    "id": "TKT-023",
+    "symptom": "We have a supplier in another country who invoices us in their local currency. The invoice is blocked for a price difference of about 3%, but the unit price in their currency is exactly what's on the PO. Nobody can explain the difference and it keeps happening on their invoices.",
+    "root_cause": "The PO converted the foreign currency price at the exchange rate on the PO date, while the invoice was valued at the rate on the invoice date. Currency movement between the two dates caused the apparent price difference.",
+    "resolution": "Buyer changed the PO to be held in the supplier's currency instead of being converted at order time. Matching now compares in the same currency and the blocked invoice was released.",
+    "category": "tax_currency_mismatch"
+  },
+  {
+    "id": "TKT-024",
+    "symptom": "VAT wrong",
+    "root_cause": "The supplier moved its registered office to a different region with a different tax rate but didn't tell us. The supplier master still had the old tax region, so the expected tax was calculated at the wrong rate.",
+    "resolution": "Supplier provided its new registration details. Supplier master was updated with the new address and tax region, and the invoice was rechecked and released.",
+    "category": "tax_currency_mismatch"
+  },
+  {
+    "id": "TKT-025",
+    "symptom": "Invoice total is a bit higher than PO total, difference is exactly the tax amount.",
+    "root_cause": "The PO price was entered as tax-inclusive by mistake, while the invoice showed net price plus tax. The tax was effectively counted twice on the invoice side of the comparison.",
+    "resolution": "Buyer corrected the PO line to a net price with the right tax code. The invoice matched after the change. Requesters were reminded to enter net prices on POs.",
+    "category": "tax_currency_mismatch"
+  },
+  {
+    "id": "TKT-026",
+    "symptom": "Invoice blocked for price.",
+    "root_cause": "The PO was in boxes of 10 and the supplier invoiced per single piece. The per-piece price on the invoice looked far lower and the quantity far higher than the PO, so the system flagged both price and quantity.",
+    "resolution": "Supplier reissued the invoice using boxes as the unit to match the PO. A unit conversion of 1 box = 10 pieces was added to the material and supplier record for future orders.",
+    "category": "uom_mismatch"
+  },
+  {
+    "id": "TKT-027",
+    "symptom": "Invoice says 2,000 and the goods receipt says 2. Same delivery. What?",
+    "root_cause": "The warehouse received the cable in drums (2 drums) while the supplier invoiced in meters (2,000 meters). There was no conversion between drums and meters set up for that item.",
+    "resolution": "A conversion of 1 drum = 1,000 meters was added to the item record. The receipt was revalued in meters and the invoice matched.",
+    "category": "uom_mismatch"
+  },
+  {
+    "id": "TKT-028",
+    "symptom": "Our chemicals supplier invoices by weight and we order by volume. Every invoice from them gets blocked and someone in AP has to manually work out whether the amount is right. It's slow and nobody is sure the manual checks are accurate.",
+    "root_cause": "The item was ordered in liters but invoiced in kilograms. The conversion depends on the product's density, which was never recorded, so the system had no way to compare the two.",
+    "resolution": "The product density was added to the item master so liters convert to kilograms automatically. Buyer and supplier also agreed to use kilograms on future POs.",
+    "category": "uom_mismatch"
+  },
+  {
+    "id": "TKT-029",
+    "symptom": "UoM error on invoice",
+    "root_cause": "The supplier used the abbreviation 'PCS' for pieces while our system expects 'EA' for each. The invoice was rejected during import before any matching took place.",
+    "resolution": "A mapping from 'PCS' to 'EA' was added to the invoice import rules. The invoice was reimported and matched.",
+    "category": "uom_mismatch"
+  },
+  {
+    "id": "TKT-030",
+    "symptom": "Invoice for printer paper blocked. The amount looks right to me, but the quantity on the invoice is 5 and the PO says 2,500.",
+    "root_cause": "The PO was raised in sheets and the supplier invoiced in cartons of 500 sheets. The total value matched but the units did not, so the line could not be matched.",
+    "resolution": "Buyer changed the PO unit to cartons for this item, since that is how it is sold. The invoice matched once the PO was updated.",
+    "category": "uom_mismatch"
+  },
+  {
+    "id": "TKT-031",
+    "symptom": "Supplier is complaining that we paid late, but the payment went out on the due date in our system.",
+    "root_cause": "The contract agreed 30-day payment terms, but the supplier master record had 60-day terms. Our system calculated a due date 30 days later than the supplier expected.",
+    "resolution": "Supplier master payment terms were corrected to 30 days in line with the contract. Late payment interest claim was reviewed and accepted for the affected invoice.",
+    "category": "payment_terms_mismatch"
+  },
+  {
+    "id": "TKT-032",
+    "symptom": "Invoice blocked for payment terms.",
+    "root_cause": "The invoice stated 15-day terms with a 2% early payment discount, while the PO carried standard 45-day terms with no discount. The terms check flagged the difference.",
+    "resolution": "Buyer confirmed the PO terms were correct and the supplier's invoice template was out of date. Invoice was released with PO terms and the supplier updated their template.",
+    "category": "payment_terms_mismatch"
+  },
+  {
+    "id": "TKT-033",
+    "symptom": "We negotiated an early payment discount with a key supplier last year and we're supposed to pay within 10 days to get 2% off. Finance just noticed we haven't taken the discount on a single invoice since the deal was signed. That's a lot of money.",
+    "root_cause": "The new terms were added to the contract but never copied to the supplier master or to the open POs. Invoices continued to be scheduled on the old net 30 terms with no discount.",
+    "resolution": "Supplier master and open POs were updated with the discount terms. Finance worked with the supplier to claim the discount retroactively on recent invoices where possible.",
+    "category": "payment_terms_mismatch"
+  },
+  {
+    "id": "TKT-034",
+    "symptom": "Payment didn't go out in the payment run.",
+    "root_cause": "The PO had payment terms 'due on receipt of goods' but the goods receipt date was in the future because it had been entered with the expected delivery date by mistake. The calculated due date had not been reached.",
+    "resolution": "Warehouse corrected the goods receipt date to the actual delivery date. The invoice became due and was included in the next payment run.",
+    "category": "payment_terms_mismatch"
+  },
+  {
+    "id": "TKT-035",
+    "symptom": "Terms mismatch PO vs master",
+    "root_cause": "The buyer manually overrode the payment terms on a single PO to match a one-off deal, but the supplier master had different terms. Invoices for that PO were blocked because terms on the PO and master disagreed.",
+    "resolution": "Procurement confirmed the one-off terms were approved. AP released the invoice with the PO terms and added a note to the PO explaining the exception.",
+    "category": "payment_terms_mismatch"
+  },
+  {
+    "id": "TKT-036",
+    "symptom": "Payment didn't go out in the payment run.",
+    "root_cause": "The supplier's bank account details were missing from the supplier master. The invoice was approved and due, but the payment run skipped it because there was nowhere to send the money.",
+    "resolution": "Supplier provided bank details on letterhead, which were verified by a call-back to a known contact. Bank details were added and the payment went out in the next run.",
+    "category": "missing_supplier_data"
+  },
+  {
+    "id": "TKT-037",
+    "symptom": "Can't create a PO for a new supplier, the supplier doesn't show up in the search.",
+    "root_cause": "The supplier onboarding request had been submitted but was still waiting for the tax registration certificate. The supplier record existed in draft but was not active for purchasing.",
+    "resolution": "Supplier sent the tax certificate. Master data team completed and activated the record, and the PO was created.",
+    "category": "missing_supplier_data"
+  },
+  {
+    "id": "TKT-038",
+    "symptom": "Invoice from a long-standing supplier was rejected during import and never reached the matching step. The supplier hasn't changed anything on their side as far as we know. Other suppliers' invoices are coming through fine.",
+    "root_cause": "The supplier's tax registration number on the master record had expired and been cleared during a yearly data clean-up. The import check requires a valid tax number before an invoice can be created.",
+    "resolution": "Supplier provided its current tax registration number. Master data team updated the record and the invoice was reimported successfully.",
+    "category": "missing_supplier_data"
+  },
+  {
+    "id": "TKT-039",
+    "symptom": "Remittance advice not reaching supplier",
+    "root_cause": "The supplier's remittance email address was blank in the supplier master. Payments were made, but the supplier had no way of knowing which invoices were paid and kept chasing.",
+    "resolution": "Supplier's accounts receivable email was added to the master record. Remittance advices for the past three months were resent.",
+    "category": "missing_supplier_data"
+  },
+  {
+    "id": "TKT-040",
+    "symptom": "Payment was blocked for a supplier that we've been paying for years. Nothing seems to be wrong with the invoice itself: it matched the PO and the receipt. AP says it's not on their side.",
+    "root_cause": "The supplier's annual compliance check was due and the required supplier certificate had not been uploaded, so the supplier record was automatically set to payment block until the data was completed.",
+    "resolution": "Supplier relationship owner obtained the renewed certificate and uploaded it. Master data team removed the payment block and the invoice was paid in the next run.",
+    "category": "missing_supplier_data"
+  }
+]
